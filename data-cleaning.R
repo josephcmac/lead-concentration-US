@@ -24,16 +24,20 @@ load_and_process_data <- function(year) {
 data <- START_YEAR:END_YEAR %>%
   map_dfr(load_and_process_data)
 
-# Add ID column
-data <- data %>%
-  mutate(ID = row_number()) %>%
-  select(ID, everything())
-
 # Split data into train and test sets
 train_indices <- sample(seq_len(nrow(data)), 
                         size = floor(TRAIN_RATIO * nrow(data)))
 train_data <- data[train_indices, ]
 test_data <- data[-train_indices, ]
+
+# Add ID column
+train_data <- train_data %>%
+  mutate(ID = row_number()) %>%
+  select(ID, everything())
+
+test_data <- test_data %>%
+  mutate(ID = row_number()) %>%
+  select(ID, everything())
 
 # Write train and test data to csv
 write.csv(train_data, file.path(PROCESSED_PATH, "train.csv"), 
